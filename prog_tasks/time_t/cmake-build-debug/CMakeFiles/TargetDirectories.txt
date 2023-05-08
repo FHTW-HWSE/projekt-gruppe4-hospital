@@ -1,0 +1,3 @@
+/Users/philipp/CLionProjects/time_t/cmake-build-debug/CMakeFiles/time_t.dir
+/Users/philipp/CLionProjects/time_t/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/philipp/CLionProjects/time_t/cmake-build-debug/CMakeFiles/rebuild_cache.dir
