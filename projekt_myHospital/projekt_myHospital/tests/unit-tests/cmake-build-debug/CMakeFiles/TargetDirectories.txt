@@ -1,0 +1,3 @@
+C:/Users/Favour/CLionProjects/projekt/unit-tests/cmake-build-debug/CMakeFiles/unit_tests.dir
+C:/Users/Favour/CLionProjects/projekt/unit-tests/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Favour/CLionProjects/projekt/unit-tests/cmake-build-debug/CMakeFiles/rebuild_cache.dir
