@@ -1,3 +1,0 @@
-C:/Users/muhan/OneDrive/Desktop/test/cmake-build-debug/CMakeFiles/test.dir
-C:/Users/muhan/OneDrive/Desktop/test/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/muhan/OneDrive/Desktop/test/cmake-build-debug/CMakeFiles/rebuild_cache.dir
