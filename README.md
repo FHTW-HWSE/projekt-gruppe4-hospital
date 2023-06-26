@@ -6,7 +6,7 @@ This project aims to prioritize patients in a hospital emergency room and assign
 
 ## Authors
 
-- [@Dominik B.](https://github.com/DBanachWegen)
+
 - [@Favour R.](https://github.com/fav0u)
 - [@Mohanad A.](https://github.com/ic22b110Mohanad)
 - [@Philipp H.](https://github.com/philipphoertnagl)
