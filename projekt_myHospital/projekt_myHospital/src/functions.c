@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include "../include/functions.h"
+#include "functions.h"
+//#include <conio.h>
+
 
 void reset_seats(Seat seats[MAX_SEAT],Patient patients[MAX_PAT]){
     for (int i = 0; i < 5; ++i) {
@@ -19,7 +19,7 @@ void reset_seats(Seat seats[MAX_SEAT],Patient patients[MAX_PAT]){
         }
     }
     FILE *fpointer_seat, *fpointer_patients, *fpointer_other;
-    fpointer_seat= fopen("../logfiles/seats.txt","w");
+    fpointer_seat= fopen("seats.txt","w");
     for (int i = 0; i < MAX_SEAT; ++i) {
         fprintf(fpointer_seat,"%d,%d,Free;\n",
                 seats[i].row,seats[i].spot);
@@ -33,7 +33,7 @@ void reset_seats(Seat seats[MAX_SEAT],Patient patients[MAX_PAT]){
         }
         k++;
     }
-    fpointer_patients= fopen("../logfiles/patients/patients.txt","w");
+    fpointer_patients= fopen("patients/patients.txt","w");
     k=0;
     while (strcmp(patients[k].svNr,"")!=0){
         fprintf(fpointer_patients,"%s,%s,%s,%s,%s,%s,%s,%lld,%s;\n",
@@ -44,7 +44,7 @@ void reset_seats(Seat seats[MAX_SEAT],Patient patients[MAX_PAT]){
     }
     fclose(fpointer_patients);
 
-    fpointer_other= fopen("../logfiles/patients/patients_other.txt","w");
+    fpointer_other= fopen("patients/patients_other.txt","w");
 
     for (int i = 0; i < MAX_PAT; ++i) {
         if(strcmp(patients[i].svNr,"")!=0 && strcmp(patients[i].status,"Ambulance")!=0){
@@ -62,7 +62,7 @@ void reset_er(ER er[MAX_ER]){
     for (int i = 0; i < MAX_ER; ++i) {
         er[i].room=i+1;
     }
-    FILE *fpointer_er = fopen("../logfiles/er.txt","w");
+    FILE *fpointer_er = fopen("er.txt","w");
     for (int i = 0; i < MAX_ER; ++i) {
         fprintf(fpointer_er,"%d,Free;\n",
                 er[i].room);
@@ -70,51 +70,60 @@ void reset_er(ER er[MAX_ER]){
     fclose(fpointer_er);
 }
 
-int load_register(Register reg[MAX_REG], Seat seats[MAX_SEAT], int record){
-
+int load_register(Register reg[MAX_REG],int record) {
     for (int i = 0; i < MAX_REG; ++i) {
-        strcpy(reg[i].pID,"");
+        strcpy(reg[i].pID, "");
     }
 
-    FILE *fpointer_register;
-    fpointer_register= fopen("../logfiles/register.txt","r");
+    FILE* fpointer_register;
+    fpointer_register = fopen("register.txt", "r");
 
-    if (fpointer_register==NULL){
+    if (fpointer_register == NULL) {
         printf("register.txt not found!\n");
         return -1;
     }
 
     int read;
-    record=0;
-    int flag=0;
-
+    record = 0;
+    int flag = 0;
 
     do {
         char row_buffer, spot_buffer, start_buffer[20], end_buffer[20];
 
-        read = fscanf(fpointer_register, "%29[^,],%c,%c,%29[^,],%29[^;\r\n]%*[\r\n]%*c",
+        read = fscanf(fpointer_register, "%29[^,],%c,%c,%29[^,],%29[^;\n]%*[;\n]",
                       reg[record].pID, &row_buffer, &spot_buffer, start_buffer, end_buffer);
+
 
         reg[record].seat_row = row_buffer - '0';
         reg[record].seat_spot = spot_buffer - '0';
         reg[record].start_time = strtoll(start_buffer, NULL, 10);
         reg[record].end_time = strtoll(end_buffer, NULL, 10);
 
-        if (read==5) record++;
-        else {
+        /*printf("Read: %d\n", read);
+        printf("pID: %s\n", reg[record].pID);
+        printf("row_buffer: %c\n", row_buffer);
+        printf("spot_buffer: %c\n", spot_buffer);
+        printf("start_buffer: %s\n", start_buffer);
+        printf("end_buffer: %s\n", end_buffer);*/
+
+        if (read == 5) {
+            record++;
+        } else {
             printf("Error loading register.txt! read:%i\n", read);
-            flag=1;
+            flag = 1;
             break;
         }
+
         if (ferror(fpointer_register)) {
             printf("Error opening file!");
             return 1;
         }
+    } while (!feof(fpointer_register) && record <= MAX_REG);
 
-    } while (!feof(fpointer_register)&&record<=MAX_REG);
-
-    if (flag==0)
+    if (flag == 0) {
         printf("register.txt opened successfully!\n\n");
+    }
+
     fclose(fpointer_register);
 
     return 0;
@@ -126,7 +135,7 @@ void load_patient_data(Patient patients[MAX_PAT], int patient_record){
         strcpy(patients[i].svNr,"");
     }
 
-    FILE *fpointer_ambulance= fopen("../logfiles/patients/patients_ambulance.txt", "r");
+    FILE *fpointer_ambulance= fopen("patients/patients_ambulance.txt", "r");
     int read;
     char date_of_arrival_str[20];
     patient_record=0;
@@ -147,7 +156,7 @@ void load_patient_data(Patient patients[MAX_PAT], int patient_record){
             patient_record++;
         }
         else{
-            printf("Formatting error! (patients_ambulance.txt) read=%d\n",read);
+            printf("No records! (patients_ambulance.txt) read=%d\n",read);
             break;
         }
 
@@ -155,7 +164,7 @@ void load_patient_data(Patient patients[MAX_PAT], int patient_record){
     fclose(fpointer_ambulance);
 
 
-    FILE *fpointer_other= fopen("../logfiles/patients/patients_other.txt", "r");
+    FILE *fpointer_other= fopen("patients/patients_other.txt", "r");
 
     if (fpointer_other==NULL){
         printf("patients_other.txt not found!");
@@ -173,7 +182,7 @@ void load_patient_data(Patient patients[MAX_PAT], int patient_record){
             patient_record++;
         }
         else{
-            printf("Formatting error! (patients_other.txt) read=%d\n",read);
+            printf("No records! (patients_other.txt) read=%d\n",read);
             break;
         }
 
@@ -183,12 +192,13 @@ void load_patient_data(Patient patients[MAX_PAT], int patient_record){
     printf("Patient data loaded! (record: %i)\n",patient_record);
 }
 
-void load_seat_data(Seat seats[MAX_SEAT]){
+void load_seat_data(Seat seats[MAX_SEAT],Patient patients[MAX_PAT]){
     FILE *fpointer_seat;
-    fpointer_seat= fopen("../logfiles/seats.txt","r");
+    fpointer_seat= fopen("seats.txt","r");
 
     if (fpointer_seat == NULL) {
         printf("Failed to open the file (seats.txt).\n");
+        reset_seats(seats,patients);
         return;
     }
 
@@ -237,10 +247,11 @@ void load_seat_data(Seat seats[MAX_SEAT]){
 
 void load_er_data(ER er[MAX_ER]){
 
-    FILE *fpointer_er = fopen("../logfiles/er.txt", "r");
+    FILE *fpointer_er = fopen("er.txt", "r");
 
     if (fpointer_er == NULL) {
         printf("Failed to open the file. (er.txt)\n");
+        reset_er(er);
         return;
     }
 
@@ -277,14 +288,11 @@ void load_er_data(ER er[MAX_ER]){
         printf("ER data could not be loaded! \nrecord");
 }
 
-
-//add function to check if Social-Security number exist
 void assign_patient_to_seat(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient patients[MAX_PAT], int record){
 
     //load_register(reg, seats, record);
 
     int occupied_counter=0;
-    int seat_flag=0;
     int fail_counter=0;
     char input;
 
@@ -317,7 +325,7 @@ void assign_patient_to_seat(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient
             //char *string_start= ctime(&reg[record].start_time);
             //char *string_end= ctime(&reg[record].end_time);
 
-            fpointer_reg= fopen("../logfiles/register.txt", "a");
+            fpointer_reg= fopen("register.txt", "a");
 
             if (fpointer_reg == NULL){
                 printf("Datei nicht gefunden (register.txt)!");
@@ -338,7 +346,7 @@ void assign_patient_to_seat(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient
 
     //Overwriting existing seats.txt file with new data
     FILE *fpointer_seats;
-    fpointer_seats= fopen("../logfiles/seats.txt","w");
+    fpointer_seats= fopen("seats.txt","w");
 
     for (int i = 0; i < MAX_SEAT; ++i) {
         fprintf(fpointer_seats,"%d,%d,%s;\n",seats[i].row,seats[i].spot,seats[i].status);
@@ -347,7 +355,7 @@ void assign_patient_to_seat(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient
     fclose(fpointer_seats);
 
     //Overwriting existing patient.txt file with new data
-    FILE *fpointer_patient= fopen("../logfiles/patients/patients.txt","w");
+    FILE *fpointer_patient= fopen("patients/patients.txt","w");
 
     int patient_record=0;
 
@@ -360,7 +368,7 @@ void assign_patient_to_seat(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient
     }
     fclose(fpointer_patient);
 
-    FILE *fpointer_other= fopen("../logfiles/patients/patients_other.txt","w");
+    FILE *fpointer_other= fopen("patients/patients_other.txt","w");
 
     int other_record=0;
 
@@ -376,15 +384,12 @@ void assign_patient_to_seat(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient
     fclose(fpointer_other);
 }
 
-//add function to check if Social-Security number exist
 void send_patient_to_er(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient patients[MAX_PAT], ER er[MAX_ER]){
 
-    int record =0;
-    int seat_flag=0;
     int fail_counter=0;
     //load_register(reg, seats, record);
 
-    char input[11], menu_input;
+    char input[11];
     long long start;
 
         fail_counter=0;
@@ -445,7 +450,7 @@ void send_patient_to_er(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient pat
     }
 
     //Overwrite existing register.txt file with new data
-    FILE *fpointer_reg= fopen("../logfiles/register.txt","w");
+    FILE *fpointer_reg= fopen("register.txt","w");
 
     for (int i = 0; i < MAX_REG; ++i) {
         if(strcmp(reg[i].pID,"")!=0) {
@@ -456,7 +461,7 @@ void send_patient_to_er(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient pat
     fclose(fpointer_reg);
 
     FILE *fpointer_seats;
-    fpointer_seats= fopen("../logfiles/seats.txt","w");
+    fpointer_seats= fopen("seats.txt","w");
 
     for (int i = 0; i < MAX_SEAT; ++i) {
         fprintf(fpointer_seats,"%d,%d,%s;\n",seats[i].row,seats[i].spot,seats[i].status);
@@ -465,7 +470,7 @@ void send_patient_to_er(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient pat
     fclose(fpointer_seats);
 
     //Overwriting existing patient.txt file with new data
-    FILE *fpointer_patient= fopen("../logfiles/patients/patients.txt","w");
+    FILE *fpointer_patient= fopen("patients/patients.txt","w");
 
     int patient_record=0;
 
@@ -478,7 +483,7 @@ void send_patient_to_er(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient pat
     }
     fclose(fpointer_patient);
 
-    FILE *fpointer_other= fopen("../logfiles/patients/patients_other.txt","w");
+    FILE *fpointer_other= fopen("patients/patients_other.txt","w");
 
     int other_record=0;
 
@@ -493,7 +498,7 @@ void send_patient_to_er(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient pat
     }
     fclose(fpointer_other);
 
-    FILE *fpointer_ambulance= fopen("../logfiles/patients/patients_ambulance.txt","w");
+    FILE *fpointer_ambulance= fopen("patients/patients_ambulance.txt","w");
 
     int ambulance_record=0;
 
@@ -509,14 +514,14 @@ void send_patient_to_er(Seat seats[MAX_SEAT], Register reg[MAX_REG], Patient pat
     fclose(fpointer_ambulance);
 
     //Overwrite existing er.txt file
-    FILE *fpointer_er= fopen("../logfiles/er.txt","w");
+    FILE *fpointer_er= fopen("er.txt","w");
 
     for (int i = 0; i < MAX_ER; ++i) {
         fprintf(fpointer_er,"%d,%s;\n",
                 er[i].room, er[i].status);
     }
     fclose(fpointer_er);
-    printf("Success!");
+    printf("Success!\n");
 }
 
 void add_patient(Patient patients[MAX_PAT], int patient_record){
@@ -578,7 +583,7 @@ void add_patient(Patient patients[MAX_PAT], int patient_record){
     }
     strcpy(patients[patient_record].status,"-");
 
-    fpointer_patient = fopen("../logfiles/patients/patients.txt","a");
+    fpointer_patient = fopen("patients/patients.txt","a");
 
     if(fpointer_patient==NULL){
         printf("Couldn't find file ---> creating new file\n");
@@ -594,7 +599,7 @@ void add_patient(Patient patients[MAX_PAT], int patient_record){
     fclose(fpointer_patient);
 
     if(strcmp(patients[patient_record].arrival_method,"Ambulance")==0){
-        fpointer_ambulance= fopen("../logfiles/patients/patients_ambulance.txt","a");
+        fpointer_ambulance= fopen("patients/patients_ambulance.txt","a");
 
         fprintf(fpointer_ambulance,"%s,%s,%s,%s,%s,%s,%s,%lld,%s;\n",
                 patients[patient_record].svNr,patients[patient_record].vorname,patients[patient_record].nachname,patients[patient_record].gebdat,
@@ -602,7 +607,7 @@ void add_patient(Patient patients[MAX_PAT], int patient_record){
                 patients[patient_record].date_of_arrival, patients[patient_record].status);
         fclose(fpointer_ambulance);
     } else{
-        fpointer_other= fopen("../logfiles/patients/patients_other.txt","a");
+        fpointer_other= fopen("patients/patients_other.txt","a");
 
         fprintf(fpointer_other,"%s,%s,%s,%s,%s,%s,%s,%lld,%s;\n",
                 patients[patient_record].svNr,patients[patient_record].vorname,patients[patient_record].nachname,patients[patient_record].gebdat,
@@ -656,7 +661,7 @@ void successful_treatment(Patient patients[MAX_PAT], ER er[MAX_ER]){
     for (int i = 0; i < MAX_PAT; ++i) {
         if (strcmp(patients[i].svNr, input) == 0){
             strcpy(patients[i].status, "treated");
-            FILE *fpointer_treated = fopen("../logfiles/patients/treated.txt","a");
+            FILE *fpointer_treated = fopen("patients/treated.txt","a");
             fprintf(fpointer_treated,"%s,%s,%s,%s,%s,%s,%s,%lld,%s;\n",
                     patients[i].svNr, patients[i].vorname, patients[i].nachname,
                     patients[i].gebdat,patients[i].telefon, patients[i].email,
@@ -667,7 +672,7 @@ void successful_treatment(Patient patients[MAX_PAT], ER er[MAX_ER]){
     }
 
     //Overwrite existing patients.txt file
-    FILE *fpointer_patients = fopen("../logfiles/patients/patients.txt","w");
+    FILE *fpointer_patients = fopen("patients/patients.txt","w");
 
     for (int i = 0; i < MAX_PAT; ++i) {
         if ((strcmp(patients[i].status, "treated") != 0) && strcmp(patients[i].svNr, "")!=0){
@@ -679,7 +684,7 @@ void successful_treatment(Patient patients[MAX_PAT], ER er[MAX_ER]){
     }
     fclose(fpointer_patients);
 
-    FILE *fpointer_other = fopen("../logfiles/patients/patients_other.txt","w");
+    FILE *fpointer_other = fopen("patients/patients_other.txt","w");
 
     for (int i = 0; i < MAX_PAT; ++i) {
         if ((strcmp(patients[i].status, "treated")) != 0 && strcmp(patients[i].svNr, "")!=0 && strcmp(patients[i].arrival_method,"Other")==0){
@@ -691,7 +696,7 @@ void successful_treatment(Patient patients[MAX_PAT], ER er[MAX_ER]){
     }
     fclose(fpointer_other);
 
-    FILE *fpointer_ambulance = fopen("../logfiles/patients/patients_ambulance.txt","w");
+    FILE *fpointer_ambulance = fopen("patients/patients_ambulance.txt","w");
 
     for (int i = 0; i < MAX_PAT; ++i) {
         if ((strcmp(patients[i].status, "treated")) != 0 && strcmp(patients[i].svNr, "")!=0 && strcmp(patients[i].arrival_method,"Ambulance")==0){
@@ -703,7 +708,7 @@ void successful_treatment(Patient patients[MAX_PAT], ER er[MAX_ER]){
     }
     fclose(fpointer_ambulance);
 
-    FILE *fpointer_er= fopen("../logfiles/er.txt","w");
+    FILE *fpointer_er= fopen("er.txt","w");
 
     for (int i = 0; i < MAX_ER; ++i) {
         fprintf(fpointer_er,"%d,%s;\n",
@@ -712,7 +717,7 @@ void successful_treatment(Patient patients[MAX_PAT], ER er[MAX_ER]){
     fclose(fpointer_er);
 }
 
-void query_seat_neighbour(Neighbour neigh[MAX_NEIGH], Register reg[MAX_REG], Seat seats[MAX_SEAT]){
+void query_seat_neighbour(Neighbour neigh[MAX_NEIGH], Register reg[MAX_REG]){
 
     for (int i = 0; i < MAX_REG; ++i) {
         strcpy(neigh[i].ID, reg[i].pID);
@@ -748,7 +753,7 @@ void query_seat_neighbour(Neighbour neigh[MAX_NEIGH], Register reg[MAX_REG], Sea
         }
     }
 
-    FILE *fpointer_neighbours= fopen("../logfiles/neighbours.txt","w");
+    FILE *fpointer_neighbours= fopen("neighbours.txt","w");
     int k=0;
     while (strcmp(neigh[k].ID,"")!=0){
         fprintf(fpointer_neighbours,"%s,%s,%s,%s,%s;\n",
@@ -756,22 +761,23 @@ void query_seat_neighbour(Neighbour neigh[MAX_NEIGH], Register reg[MAX_REG], Sea
         k++;
     }
     fclose(fpointer_neighbours);
-    printf("done!");
+    printf("done!\n");
 }
 
-void contact_trace(Neighbour neigh[MAX_NEIGH], Register reg[MAX_REG], Seat seats[MAX_SEAT]){
+void contact_trace(Neighbour neigh[MAX_NEIGH]){
     int flag=1;
     char input[11];
     int fail_counter=0;
 
     while (flag==1){
+        fail_counter=0;
         flag=0;
         printf("Enter Social Security Number of Patient: ");
         scanf("%11s",input);
         for (int i = 0; i < MAX_NEIGH; ++i) {
             if (strcmp(neigh[i].ID,input)==0){
-                printf("%s had contact with following people:\n%s\n%s\n%s\n%s",
-                       neigh[i].ID,neigh[i].n1,neigh[i].n2,neigh[i].n3,neigh[i].n4);
+                printf("%s had contact with following people:\n%s\n%s\n",
+                       neigh[i].ID,neigh[i].n1,neigh[i].n2);
                 flag=0;
                 break;
             } else fail_counter++;
@@ -781,4 +787,62 @@ void contact_trace(Neighbour neigh[MAX_NEIGH], Register reg[MAX_REG], Seat seats
             flag=1;
         }
     }
+}
+
+void check_credentials(Admin admin, char username[11], char password[11]){
+    int flag=1;
+    while (flag==1){
+        printf("Username: ");
+        scanf("%10s",username);
+
+        if(strcmp(username,"0")==0) {
+            return;
+        }
+        printf("\nPassword: ");
+        scanf("%10s",password);
+        if (strcmp(admin.username,username)!=0 || strcmp(admin.password,password)!=0){
+            printf("Username or password didn't match! \nPlease try again!\n8");
+            flag=1;
+        } else{
+            printf("Login successful!\n");
+            flag=0;
+        }
+    }
+}
+
+void load_archive(Archive archives[MAX_ARCHIVE]){
+
+    for (int i = 0; i < MAX_PAT; ++i) {
+        strcpy(archives[i].svNr, "");
+    }
+
+    FILE *fpointer_treated= fopen("patients/treated.txt", "r");
+    int read;
+    char date_of_arrival_str[20];
+    int patient_record=0;
+
+    if (fpointer_treated == NULL){
+        printf("treated.txt not found!");
+        return;
+    }
+
+    do {
+        read = fscanf(fpointer_treated, "%50[^,],%50[^,],%50[^,],%20[^,],%50[^,],%50[^,],%50[^,],%50[^,],%50[^;\n]%*[^\r\n]%*[\r\n]",
+                      archives[patient_record].svNr, archives[patient_record].vorname, archives[patient_record].nachname,
+                      archives[patient_record].gebdat, archives[patient_record].telefon, archives[patient_record].email,
+                      archives[patient_record].arrival_method, date_of_arrival_str, archives[patient_record].status);
+
+        if(read==9) {
+            archives[patient_record].date_of_arrival = strtoll(date_of_arrival_str, NULL, 10);
+            patient_record++;
+        }
+        else{
+            printf("No records! (treated.txt) read=%d\n",read);
+            break;
+        }
+
+    } while (!feof(fpointer_treated) && patient_record <= MAX_ARCHIVE);
+    fclose(fpointer_treated);
+
+    printf("Archives loaded!");
 }
