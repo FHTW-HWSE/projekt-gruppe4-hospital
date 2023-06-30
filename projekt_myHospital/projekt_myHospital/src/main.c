@@ -2,7 +2,7 @@
 #include <time.h>
 #include <string.h>
 #include <unistd.h>
-#include "../include/functions.h"
+#include "functions.h"
 
 int main() {
 
@@ -11,27 +11,30 @@ int main() {
     Patient patients[MAX_PAT];
     ER er[MAX_ER];
     Neighbour neigh[MAX_NEIGH];
+    Archive archives[MAX_ARCHIVE];
+    Admin admin = {"Admin", "12345"};
 
-    int read;
     int reg_record=0;
     int patient_record=0;
     char input='d';
+    char username[11],password[11];
 
     while (input!=0){
 
         load_er_data(er);
-        load_seat_data(seats);
+        load_seat_data(seats,patients);
         load_patient_data(patients,patient_record);
-        load_register(reg, seats, reg_record);
+        load_register(reg,reg_record);
 
-
-        printf("[1] Patients\n"
+        printf("\n[1] Patients\n"
                "[2] Seats\n"
                "[3] Show ER's\n"
-               "[4] Assign Patient a seat\n"
-               "[5] Send Patient to the ER\n"
+               "[4] Assign next Patient a seat\n"
+               "[5] Send next Patient to the ER\n"
                "[6] Discharge Patient\n"
-               "[7] Contact trace\n\n"
+               "[7] Contact trace\n"
+               "[8] Archives\n\n"
+
                "[0] End Program\n");
         scanf("%c",&input);
 
@@ -66,7 +69,7 @@ int main() {
                     case '2':
                         add_patient(patients, patient_record);
                         load_patient_data(patients,patient_record);
-                        load_seat_data(seats);
+                        load_seat_data(seats,patients);
                         assign_patient_to_seat(seats, reg, patients, reg_record);
                         //send_patient_to_er(seats, reg, patients, er);
                         //query_seat_neighbour(neigh, reg, seats);
@@ -159,12 +162,82 @@ int main() {
                 break;
 
             case '7':
-                query_seat_neighbour(neigh,reg,seats);
-                contact_trace(neigh,reg,seats);
+                query_seat_neighbour(neigh,reg);
+                contact_trace(neigh);
                 sleep(2);
                 getchar();
                 break;
 
+            case '8':
+                printf("You need admin privileges to access the archives! (username: 'Admin', pwd='12345')\n");
+                check_credentials(admin,username,password);
+                while (1) {
+                    load_archive(archives);
+                    case8:
+                    input = '0';
+                    printf("\n\n[1] Show all entries \n[2] Search for Patient \n[3] Return to main menu\n\n");
+                    scanf(" %c", &input); // Notice the space before %c to consume the newline character
+                    switch (input) {
+                        case '1':
+                            while (strcmp(archives[i].svNr, "") != 0) {
+                                // Print patient information
+                                printf("Social security number: %s\n"
+                                       "First Name: %s\n"
+                                       "Last Name: %s\n"
+                                       "Date of Birth: %s\n"
+                                       "Telephone Number: %s\n"
+                                       "Email address: %s\n"
+                                       "Method of Arrival: %s\n"
+                                       "Date of arrival: %s"
+                                       "Status: %s\n",
+                                       archives[i].svNr, archives[i].vorname, archives[i].nachname,
+                                       archives[i].gebdat,
+                                       archives[i].telefon, archives[i].email, archives[i].arrival_method,
+                                       ctime(&archives[i].date_of_arrival), archives[i].status);
+                                printf("-----------------------------\n");
+                                i++;
+                            }
+                            break;
+
+                        case '2':
+                            printf("Social Security Number of Patient: ");
+                            scanf("%11s", svnr);
+                            int fail = 0;
+                            for (int j = 0; j < MAX_ARCHIVE; ++j) {
+                                if (strcmp(svnr, archives[j].svNr) == 0) {
+                                    printf("Social security number: %s\n"
+                                           "First Name: %s\n"
+                                           "Last Name: %s\n"
+                                           "Date of Birth: %s\n"
+                                           "Telephone Number: %s\n"
+                                           "Email address: %s\n"
+                                           "Method of Arrival: %s\n"
+                                           "Date of arrival: %s"
+                                           "Status: %s\n",
+                                           archives[j].svNr, archives[j].vorname, archives[j].nachname,
+                                           archives[j].gebdat,
+                                           archives[j].telefon, archives[j].email, archives[j].arrival_method,
+                                           ctime(&archives[j].date_of_arrival), archives[j].status);
+                                    break;
+                                } else fail++;
+                            }
+                            if (fail >= MAX_PAT) {
+                                printf("No matches found!\n");
+                                goto case8;
+                            }
+
+                        case '3':
+                            goto end;
+
+                        default:
+                            printf("Invalid input!\n");
+                            break;
+                    }
+                }
+            end:
+                sleep(1);
+                getchar();
+                break;
             case '0':
                 return -1;
 
