@@ -1,0 +1,3 @@
+/Users/philipp/FH/HSWE_2/GIT/projekt-gruppe4-hospital/projekt_myHospital/projekt_myHospital/build/CMakeFiles/myHospital.dir
+/Users/philipp/FH/HSWE_2/GIT/projekt-gruppe4-hospital/projekt_myHospital/projekt_myHospital/build/CMakeFiles/edit_cache.dir
+/Users/philipp/FH/HSWE_2/GIT/projekt-gruppe4-hospital/projekt_myHospital/projekt_myHospital/build/CMakeFiles/rebuild_cache.dir
