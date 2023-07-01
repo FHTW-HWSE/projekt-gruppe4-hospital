@@ -1,3 +1,0 @@
-5110300701,Favour,Reuben,30.07.2001,06646404406,favourreuben2001@gmail.com,Other,0,-;
-000000001,Max,Mustermann,01.01.2000,32148585,max@gmail.com,Other,0,-;
-357951485,Mark,Mller,12.12.2001,32354543,fdsfa,Other,0,-;
