@@ -1,3 +1,0 @@
-C:/Users/muhan/CLionProjects/_Mohanad_Unittests/cmake-build-debug/CMakeFiles/_Mohanad_Unittests.dir
-C:/Users/muhan/CLionProjects/_Mohanad_Unittests/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/muhan/CLionProjects/_Mohanad_Unittests/cmake-build-debug/CMakeFiles/rebuild_cache.dir
