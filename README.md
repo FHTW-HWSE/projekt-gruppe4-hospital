@@ -11,3 +11,16 @@ This project aims to prioritize patients in a hospital emergency room and assign
 - [@Philipp H.](https://github.com/philipphoertnagl)
 
 
+## Compiling
+When using the terminal (bash shell, zsh, etc.) go in the **build** directory and use the following commands:
+
+`cmake ..`
+
+then use the command:
+`make all`
+
+for deleting binary and executable files use:
+`make clean`
+
+
+If you use CLion or any other IDE which works with CMake just download the project and paste the folder in the IDE. Build the project and run it.
