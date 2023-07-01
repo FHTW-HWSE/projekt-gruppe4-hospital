@@ -12,7 +12,7 @@ This project aims to prioritize patients in a hospital emergency room and assign
 
 ## Compiling
 When using the terminal (bash shell, zsh, etc.) go in the **build** directory and use the following commands:
-"**cmake ..**"
+`**cmake ..**`
 
 then use the command:
 "**make all**"
