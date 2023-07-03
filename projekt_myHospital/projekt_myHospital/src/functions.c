@@ -776,8 +776,8 @@ void contact_trace(Neighbour neigh[MAX_NEIGH]){
         scanf("%11s",input);
         for (int i = 0; i < MAX_NEIGH; ++i) {
             if (strcmp(neigh[i].ID,input)==0){
-                printf("%s had contact with following people:\n%s\n%s\n",
-                       neigh[i].ID,neigh[i].n1,neigh[i].n2);
+                 printf("%s had contact with following people:\n%s\n%s\n%s\n%s\n",
+                       neigh[i].ID,neigh[i].n1,neigh[i].n2, neigh[i].n3, neigh[i].n4);
                 flag=0;
                 break;
             } else fail_counter++;
