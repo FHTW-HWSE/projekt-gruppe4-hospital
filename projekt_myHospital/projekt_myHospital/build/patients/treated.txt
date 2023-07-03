@@ -1,0 +1,3 @@
+5110300701,Favour,Reuben,30.07.2001,06646404406,favour@gmail.com,Other,0,treated;
+0000000001,Mohanad,Alrachid,30.01.2012,446445858,mo@gmail.com,Ambulance,1688125389,treated;
+1234567890,Max,Mustermann,12.12.2012,3434535,max@gmail.com,Other,0,treated;
